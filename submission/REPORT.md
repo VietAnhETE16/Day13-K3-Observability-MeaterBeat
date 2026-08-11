@@ -10,7 +10,7 @@
 ## 2. Kết quả kỹ thuật
 
 - Điểm `validate_logs.py`: 100/100
-- Tổng số traces: 60 trace có tag `lab` (xác minh qua Langfuse API ngày 2026-08-11)
+- Tổng số traces: 90 trace có tag `lab` (xác minh lại qua Langfuse API sau merge ngày 2026-08-11)
 - Số PII leak còn lại: 0
 - Link/đường dẫn dashboard: `config/dashboard.yaml` và `docs/dashboard-spec.md`
 
@@ -18,7 +18,7 @@
 
 - Evidence correlation ID: `submission/evidence/log_sample.jsonl` (ví dụ `correlation_id: "req-dfffbcb8"` đồng bộ giữa `request_received` và `response_sent`)
 - Evidence PII redaction: `submission/evidence/log_sample.jsonl` (`[REDACTED_EMAIL]`, `[REDACTED_PHONE_VN]`, `[REDACTED_CREDIT_CARD]`) và `submission/evidence/log_validator.png`
-- Evidence trace waterfall: cần bổ sung ảnh giao diện Langfuse vào `submission/evidence/`; trace đã xác minh: `393b6a3e3ab66838f0deeac3420e4248`.
+- Evidence trace waterfall: cần bổ sung ảnh giao diện Langfuse vào `submission/evidence/`; trace sau merge đã xác minh: `23fdac4725e65af966debf76d8f9dce6`.
 - Giải thích một span đáng chú ý: trace trên có `run` (GENERATION) bao hai span con `retrieve` và `generate`, cho phép tách thời gian retrieval khỏi thời gian sinh câu trả lời.
 
 ## 4. Prompt versioning
