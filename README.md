@@ -2,6 +2,15 @@
 
 Trong lab 4 giờ này, bạn sẽ biến một API AI chạy được nhưng khó quan sát thành một hệ thống có thể theo dõi, phát hiện sự cố và giải thích nguyên nhân bằng bằng chứng.
 
+
+## Danh sách thành viên nhóm
+
+| Họ tên | Mã học viên | Vai trò |
+|---|---|---|
+| Mai Việt Anh | 2A202601083 | Trưởng nhóm; CP1 Logging và PII (Correlation ID, JSON log enrichment, user hash, PII redaction) |
+| Lương Đăng Doanh | 2A202601209 | CP2 Metrics, Traces và Dashboard (Langfuse traces, prompt metadata/version, dashboard 6 panel, SLO/alert) |
+| Trương Đình Khoa | 2A202601297 | CP3 Challenge (Incident `rag_slow`, load test challenge, root cause analysis & fix) |
+
 ## Sau lab, bạn làm được gì?
 
 - Ghi log JSON có cấu trúc và correlation ID xuyên suốt một request.
