@@ -6,8 +6,12 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from structlog.contextvars import bind_contextvars
 
-from .dashboard import render_dashboard
 from .agent import LabAgent
+from .audit import write_audit_event
+from .cost_control import disable as disable_cost_optimization
+from .cost_control import enable as enable_cost_optimization
+from .cost_control import status as cost_optimization_status
+from .dashboard import render_dashboard
 from .incidents import disable, enable, status
 from .logging_config import configure_logging, get_logger
 from .metrics import record_error, snapshot
@@ -35,7 +39,12 @@ async def startup() -> None:
 
 @app.get("/health")
 async def health() -> dict:
-    return {"ok": True, "tracing_enabled": tracing_enabled(), "incidents": status()}
+    return {
+        "ok": True,
+        "tracing_enabled": tracing_enabled(),
+        "incidents": status(),
+        "cost_optimization": cost_optimization_status(),
+    }
 
 
 @app.get("/metrics")
@@ -105,6 +114,11 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
 async def enable_incident(name: str) -> JSONResponse:
     try:
         enable(name)
+        write_audit_event(
+            "incident_enabled",
+            actor="api",
+            payload={"name": name, "incidents": status()},
+        )
         log.warning("incident_enabled", service="control", payload={"name": name})
         return JSONResponse({"ok": True, "incidents": status()})
     except KeyError as exc:
@@ -115,7 +129,36 @@ async def enable_incident(name: str) -> JSONResponse:
 async def disable_incident(name: str) -> JSONResponse:
     try:
         disable(name)
+        write_audit_event(
+            "incident_disabled",
+            actor="api",
+            payload={"name": name, "incidents": status()},
+        )
         log.warning("incident_disabled", service="control", payload={"name": name})
         return JSONResponse({"ok": True, "incidents": status()})
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/config/cost-optimization/enable")
+async def enable_cost_optimization_endpoint(max_output_tokens: int | None = None) -> JSONResponse:
+    state = enable_cost_optimization(max_output_tokens)
+    write_audit_event(
+        "config_changed",
+        actor="api",
+        payload={"config": "cost_optimization", "state": state},
+    )
+    log.warning("cost_optimization_enabled", service="control", payload=state)
+    return JSONResponse({"ok": True, "cost_optimization": state})
+
+
+@app.post("/config/cost-optimization/disable")
+async def disable_cost_optimization_endpoint() -> JSONResponse:
+    state = disable_cost_optimization()
+    write_audit_event(
+        "config_changed",
+        actor="api",
+        payload={"config": "cost_optimization", "state": state},
+    )
+    log.warning("cost_optimization_disabled", service="control", payload=state)
+    return JSONResponse({"ok": True, "cost_optimization": state})
